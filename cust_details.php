@@ -3,19 +3,9 @@ session_start();
 ini_set('memory_limit', '-1');
 set_time_limit(5000);
 require 'vendor/autoload.php';
-//require 'db.php';
+require 'db.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
 
-$servername = "localhost";
-$username = "root";
-$password = "";
-
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=axis_bank", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-}
   
 // Check if a file is uploaded
 if (isset($_FILES['excel_file'])) {

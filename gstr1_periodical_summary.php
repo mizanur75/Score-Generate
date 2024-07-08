@@ -2,17 +2,7 @@
 session_start(); 
 require 'vendor/autoload.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
-$servername = "localhost";
-$username = "root";
-$password = "";
-
-try {
-    $conn = new PDO("mysql:host=$servername;dbname=axis_bank", $username, $password);
-    $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-} catch(PDOException $e) {
-    echo "Connection failed: " . $e->getMessage();
-}
+require 'db.php';
 
 if (isset($_FILES['excel_file'])) {
     $file = $_FILES['excel_file'];
