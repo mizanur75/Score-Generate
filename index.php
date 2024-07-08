@@ -84,7 +84,8 @@
 
     <div class="container">
       <div class="row mt-5 text-center" style="margin-top: 300px !important;">
-        <h2 class="mt-5">Please Upload file and complete the above section then with bellow</h2>
+        <h2 class="mt-5">Please Upload file and complete the above section then go to bellow</h2>
+        <hr>
         <div class="col-3">
           <form action="derived_gst.php" method="POST">
             <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
