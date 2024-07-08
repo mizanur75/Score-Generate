@@ -101,8 +101,8 @@
           </form>
         </div>
         <div class="col-3">
-          <form action="scaled_output.php" method="POST">
-            <button type="submit" class="btn btn-primary">Scaled Inputs</button>
+          <form action="scaled_outputs.php" method="POST">
+            <button type="submit" class="btn btn-primary">Scaled Outputs</button>
           </form>
         </div>
       </div>
