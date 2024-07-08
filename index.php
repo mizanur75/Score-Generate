@@ -90,19 +90,24 @@
             <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
           </form>
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <form action="data_analysis.php" method="POST">
-            <button type="submit" class="btn btn-primary">Data Analysis Result</button>
+            <button type="submit" class="btn btn-success">Data Analysis Result</button>
           </form>
         </div>
         <div class="col-3">
           <form action="scaled_inputs.php" method="POST">
-            <button type="submit" class="btn btn-primary">Scaled Inputs with Cat Attr</button>
+            <button type="submit" class="btn btn-secondary">Scaled Inputs with Cat Attr</button>
           </form>
         </div>
-        <div class="col-3">
+        <div class="col-2">
           <form action="scaled_outputs.php" method="POST">
-            <button type="submit" class="btn btn-primary">Scaled Outputs</button>
+            <button type="submit" class="btn btn-danger">Scaled Outputs</button>
+          </form>
+        </div>
+        <div class="col-2">
+          <form action="score_generate.php" method="POST">
+            <button type="submit" class="btn btn-warning">Generate Score</button>
           </form>
         </div>
       </div>
