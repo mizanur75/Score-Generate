@@ -91,18 +91,18 @@
           </form>
         </div>
         <div class="col-3">
-          <form action="derived_gst.php" method="POST">
-            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          <form action="data_analysis.php" method="POST">
+            <button type="submit" class="btn btn-primary">Data Analysis Result</button>
           </form>
         </div>
         <div class="col-3">
-          <form action="derived_gst.php" method="POST">
-            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          <form action="scaled_input.php" method="POST">
+            <button type="submit" class="btn btn-primary">Scaled Inputs with Cat Attr</button>
           </form>
         </div>
         <div class="col-3">
-          <form action="derived_gst.php" method="POST">
-            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          <form action="scaled_output.php" method="POST">
+            <button type="submit" class="btn btn-primary">Scaled Inputs</button>
           </form>
         </div>
       </div>
