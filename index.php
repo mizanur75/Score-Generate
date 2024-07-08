@@ -69,7 +69,7 @@
 
       <!-- Form 3 -->
       <form id="form3" action="cust_details.php" method="POST" enctype="multipart/form-data" style="display: none;">
-      <div class="row">
+        <div class="row">
           <div class="input-group mb-3">
             <input type="file" name="excel_file" class="form-control" id="inputGroupFile02">
             <label class="input-group-text" for="inputGroupFile02">Upload</label>
@@ -79,6 +79,8 @@
       </form>
 
     </div>
+
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <script>
