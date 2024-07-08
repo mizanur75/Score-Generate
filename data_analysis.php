@@ -1,5 +1,7 @@
 <?php 
 session_start();
+ini_set('max_execution_time',-1);
+ini_set('memory_limit',-1);
 
 require  'db.php';
 
