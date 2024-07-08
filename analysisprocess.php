@@ -1,7 +1,7 @@
 <?php
 session_start();
-ini_set('max_execution_time',0);
-ini_set('memory_limit',0);
+ini_set('max_execution_time',-1);
+ini_set('memory_limit',-1);
 require 'vendor/autoload.php';
 require 'db.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
