@@ -10,7 +10,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
   </head>
   <body>
-    <div class="container">
+    <div class="container mb-5">
       <h1 class="text-center m-5">Grab Excel Data</h1>
       <?php
         if(isset($_SESSION['success'])){
@@ -80,7 +80,35 @@
 
     </div>
 
-    
+
+
+    <div class="container">
+      <div class="row mt-5 text-center" style="margin-top: 300px !important;">
+        <h2 class="mt-5">Please Upload file and complete the above section then with bellow</h2>
+        <div class="col-3">
+          <form action="derived_gst.php" method="POST">
+            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          </form>
+        </div>
+        <div class="col-3">
+          <form action="derived_gst.php" method="POST">
+            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          </form>
+        </div>
+        <div class="col-3">
+          <form action="derived_gst.php" method="POST">
+            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          </form>
+        </div>
+        <div class="col-3">
+          <form action="derived_gst.php" method="POST">
+            <button type="submit" class="btn btn-primary">Derived GST Periodical Summary</button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 
     <script>
