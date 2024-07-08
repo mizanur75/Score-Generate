@@ -96,7 +96,7 @@
           </form>
         </div>
         <div class="col-3">
-          <form action="scaled_input.php" method="POST">
+          <form action="scaled_inputs.php" method="POST">
             <button type="submit" class="btn btn-primary">Scaled Inputs with Cat Attr</button>
           </form>
         </div>
