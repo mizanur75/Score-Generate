@@ -8,7 +8,6 @@ require 'db.php';
 $query = "INSERT INTO scaled_inputs (`cat_Business_Constitution`,`cat_gender`,`cat_no_of_Coapp`,`No_of_Dependents`,`CAT_loan_tenure`,`CAT_YearExp`,`cat_eligibility`,`cat_qualification`,`cat_cibil`,`cat_relation`,`cat_channel`,`cat_exist_customer`,`cat_company`,`cat_loan_type`,`cat_industry_type`,`cat_city_state`,`cat_lpsp`,`CAT_foir`,`cat_bank_emi`,`cat_age`)
 
 SELECT 
-    
     CASE 
         WHEN acm_business_constitution.Assigned_Category IS NOT NULL THEN acm_business_constitution.Assigned_Category
         ELSE 1
@@ -208,11 +207,11 @@ AND acm_city_state.Model_Name = '1'
 LEFT OUTER JOIN attribute_category_master AS acm_lpsp ON TRIM(cd.Loan_Product_Sub_Proct_Type) = TRIM(acm_lpsp.Value_of_Attribute)
 AND acm_lpsp.Attribute = 'Loan_Product_Sub_Proct_Type'
 AND acm_lpsp.Model_Name = '1'
-ORDER BY cd.id ASC;
 ";
 
 
-$res = $conn->query($query);
+$res = $conn->prepare($query);
+$res->execute();
 
 if($res){
 	$_SESSION['success'] = "Data Insert Scaled Input success";

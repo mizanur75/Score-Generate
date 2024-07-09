@@ -20,6 +20,7 @@ if (isset($_FILES['excel_file'])) {
 
             // Process the first sheet (GSTR1 Periodical Summary)
             $sheet1 = $spreadsheet->getSheetByName('GSTR1 Periodical Summary');
+            $ref_id = $sheet1->getCell('B208')->getValue();
             // Get the highest row number and column name
             $highestRow1 = $sheet1->getHighestRow();
             $highestColumn1 = $sheet1->getHighestColumn();
@@ -54,13 +55,13 @@ if (isset($_FILES['excel_file'])) {
             $result = false;
             $count = count($filteredValue[0]) - 1;
             for($i; $i <= $count; $i ++){
-              $sql = "INSERT INTO gstr1_periodical_summary (`Month_Name`,`Total_Invoice_Value`,`Total_Taxable_Value`,`B2B_Invoice_Value`,`B2C_Large_Invoice_Value`,`B2C_Small_Invoice_Value`,`Export_Invoice_Value`) VALUES (?, ?, ?, ?, ?, ?, ?)";
+              $sql = "INSERT INTO gstr1_periodical_summary (`ref_id`,`Month_Name`,`Total_Invoice_Value`,`Total_Taxable_Value`,`B2B_Invoice_Value`,`B2C_Large_Invoice_Value`,`B2C_Small_Invoice_Value`,`Export_Invoice_Value`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
     
               // Prepare SQL query
               $res = $conn->prepare($sql);
               
               // Execute SQL query
-              $res->execute([$filteredValue[0][$i], $filteredValue[1][$i], $filteredValue[2][$i], $filteredValue[3][$i], $filteredValue[4][$i], $filteredValue[5][$i], $filteredValue[6][$i]]);
+              $res->execute([$ref_id, $filteredValue[0][$i], $filteredValue[1][$i], $filteredValue[2][$i], $filteredValue[3][$i], $filteredValue[4][$i], $filteredValue[5][$i], $filteredValue[6][$i]]);
 
               $result = true;
             }
@@ -101,13 +102,13 @@ if (isset($_FILES['excel_file'])) {
             $result = false;
             $count = count($filteredValue[0]) - 1;
             for($i; $i <= $count; $i ++){
-              $sql = "INSERT INTO gstr3b_periodical_summary (`Month_Name`,`SGST`,`CGST`,`IGST`,`Total_Tax_Zero_rated_Outward_taxable_supplies`,`Total_Tax_nill_rated_Outward_taxable_supplies`,`Total_Tax_Paid`,`Tax_paid_In_Credit`,`Interest_Payment`,`Late_Fee`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+              $sql = "INSERT INTO gstr3b_periodical_summary (`ref_id`,`Month_Name`,`SGST`,`CGST`,`IGST`,`Total_Tax_Zero_rated_Outward_taxable_supplies`,`Total_Tax_nill_rated_Outward_taxable_supplies`,`Total_Tax_Paid`,`Tax_paid_In_Credit`,`Interest_Payment`,`Late_Fee`) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
     
               // Prepare SQL query
               $res = $conn->prepare($sql);
               
               // Execute SQL query
-              $res->execute([$filteredValue[0][$i], $filteredValue[1][$i], $filteredValue[2][$i], $filteredValue[3][$i], $filteredValue[4][$i], $filteredValue[5][$i], $filteredValue[6][$i], $filteredValue[7][$i], $filteredValue[8][$i], $filteredValue[9][$i]]);
+              $res->execute([$ref_id, $filteredValue[0][$i], $filteredValue[1][$i], $filteredValue[2][$i], $filteredValue[3][$i], $filteredValue[4][$i], $filteredValue[5][$i], $filteredValue[6][$i], $filteredValue[7][$i], $filteredValue[8][$i], $filteredValue[9][$i]]);
 
               $result = true;
             }

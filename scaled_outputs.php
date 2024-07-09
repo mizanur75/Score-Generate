@@ -122,7 +122,8 @@ FROM `scaled_inputs`;
 ";
 
 
-$res = $conn->query($query);
+$res = $conn->prepare($query);
+$res->execute();
 
 if($res){
 	$_SESSION['success'] = "Data Insert Scaled Output success";

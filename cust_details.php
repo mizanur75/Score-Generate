@@ -5,7 +5,6 @@ set_time_limit(5000);
 require 'vendor/autoload.php';
 require 'db.php';
 use PhpOffice\PhpSpreadsheet\IOFactory;
-
   
 // Check if a file is uploaded
 if (isset($_FILES['excel_file'])) {
@@ -56,14 +55,15 @@ if (isset($_FILES['excel_file'])) {
                 $createTableQuery = rtrim($createTableQuery, ", ") . ")";
                 
                 // Execute create table query
-                $conn->query($createTableQuery);
+                $res = $conn->prepare($createTableQuery);
+                $res->execute();
               // }
               
 
               // Iterate through each row again to insert data
               $firstRow = 0;
               foreach ($worksheet->getRowIterator() as $key => $row) {
-                  $insertQuery = "INSERT INTO $tableName VALUES (";
+                  $insertQuery = "INSERT INTO `custdata` VALUES (";
 
                   $cells = $row->getCellIterator();
                   foreach ($cells as $cell) {
@@ -74,11 +74,12 @@ if (isset($_FILES['excel_file'])) {
                   
                   // Execute insert query
                   if($firstRow > 0){
-                    $conn->query($insertQuery);
+                    $res = $conn->prepare($insertQuery);
+                    $res->execute();
                   }
                   $firstRow ++;
               }
-              $msg = 'Data imported successfully!';
+              $msg = 'Customer Data imported successfully!';
             }
 
 
