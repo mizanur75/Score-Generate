@@ -7,15 +7,15 @@ require 'db.php';
 $variable_coefficient_query = $conn->query("SELECT * FROM variable_coefficient");
 $variable_coefficient_result = $variable_coefficient_query->fetchAll();
 
-// Fetch data from scaled_inputs table
-$scaled_inputs_query = $conn->query("SELECT * FROM scaled_outputs");
-$scaled_inputs_result = $scaled_inputs_query->fetchAll();
+// Fetch data from scaled_outputs table
+$scaled_outputs_query = $conn->query("SELECT * FROM scaled_outputs");
+$scaled_outputs_result = $scaled_outputs_query->fetchAll();
 
-// var_dump($scaled_inputs_query->columnCount()); exit;
+// var_dump($scaled_outputs_query->columnCount()); exit;
 
 
 // Check if both queries were successful
-if ($variable_coefficient_result && $scaled_inputs_result) {
+if ($variable_coefficient_result && $scaled_outputs_result) {
     // Initialize arrays to store fetched data
     $variable_coefficients = array();
     $scaled_inputs = array();
@@ -28,14 +28,14 @@ if ($variable_coefficient_result && $scaled_inputs_result) {
     // var_dump($variable_coefficients); exit;
 
 
-    foreach ($scaled_inputs_result as $key => $value) {
-        $scaled_inputs_row = array();
+    foreach ($scaled_outputs_result as $key => $value) {
+        $scaled_outputs_row = array();
         
-        for ($i = 0; $i < $scaled_inputs_query->columnCount(); $i++) { // Assuming columns
-            $scaled_inputs_row[] = $value[$i]; // Assuming column names value
+        for ($i = 0; $i < $scaled_outputs_query->columnCount(); $i++) { // Assuming columns
+            $scaled_outputs_row[] = $value[$i]; // Assuming column names value
         }
-        $scaled_inputs[] = $scaled_inputs_row;
-        // var_dump($scaled_inputs_row); exit;
+        $scaled_inputs[] = $scaled_outputs_row;
+        // var_dump($scaled_outputs_row); exit;
     }
 
     // Perform dot product
