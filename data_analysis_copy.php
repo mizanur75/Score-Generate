@@ -13,7 +13,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
             derived_gstr1_periodical_summary
         )AS ref_id,
         
-        
+        -- B2B invoice value
         (SELECT COUNT(b2b_iv) AS b2b_iv FROM (
             SELECT
                 (b2b_iv_by_total_value - lag(b2b_iv_by_total_value, 2) over (ORDER BY id)) / (lag(b2b_iv_by_total_value, 2) over (ORDER BY id)) AS b2b_iv
@@ -21,7 +21,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         ) AS subquery_b2b_iv
         WHERE b2b_iv > .15) AS b2b_iv,
 
-
+        -- B2C large invoice value
         (SELECT COUNT(b2c_liv) as b2c_liv FROM (
             SELECT 
                 (b2c_liv_by_total_value - lag(b2c_liv_by_total_value, 2) over (ORDER BY id)) / (lag(b2c_liv_by_total_value, 2) over (ORDER BY id)) AS b2c_liv
@@ -30,7 +30,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         WHERE b2c_liv > .15) AS b2c_liv,
         
         
-
+        -- B2C small invoice value
         (SELECT COUNT(b2c_siv) AS b2c_siv FROM (
             SELECT 
                 (b2c_siv_by_total_value - lag(b2c_siv_by_total_value, 2) over (ORDER BY id)) / (lag(b2c_siv_by_total_value, 2) over (ORDER BY id)) AS b2c_siv
@@ -38,38 +38,40 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         ) AS subquery
         WHERE b2c_siv > .15) AS b2c_siv,
         
+        -- Export total invoice value
         (SELECT COUNT(export_iv) AS export_iv FROM (
             SELECT (`Export_Iv` - lag(`Export_Iv`, 1) over (ORDER BY id)) / (lag(`Export_Iv`, 1) over (ORDER BY id)) AS export_iv
             FROM derived_gstr1_periodical_summary
         ) AS subquery
         WHERE Export_Iv IS NOT NULL AND Export_Iv != 0 AND export_iv > .15) AS export_iv,
         
-        
+
+        -- SGST total taxable value
         (SELECT COUNT(sci_gst) AS sci_gst FROM (
              SELECT ((`SGST`+`CGST`-`IGST`) - lag((`SGST`+`CGST`-`IGST`), 2) over (ORDER BY id)) / lag((`SGST`+`CGST`-`IGST`),2) over (ORDER BY id) AS sci_gst FROM gstr3b_periodical_summary
         ) AS subquery
         WHERE sci_gst > .15) AS sci_gst,
 
-
+        -- Outward taxable supplies (zero rated)
         (SELECT COUNT(tax_zero_outware) AS tax_zero_outware FROM (
             SELECT (`Total_Tax_Zero_rated_Outward_taxable_supplies` - lag(Total_Tax_Zero_rated_Outward_taxable_supplies, 2) over (ORDER BY id)) / (lag(Total_Tax_Zero_rated_Outward_taxable_supplies,2) over (ORDER BY id)) AS tax_zero_outware FROM gstr3b_periodical_summary
         ) AS subquery
         WHERE tax_zero_outware > .15) AS tax_zero_outware,
         
-        
+        -- Outward taxable supplies (Nil rated, exempted)
         (SELECT COUNT(tax_nill_outware) AS tax_nill_outware FROM (
             SELECT (`Total_Tax_nill_rated_Outward_taxable_supplies` - lag(Total_Tax_nill_rated_Outward_taxable_supplies, 2) over (ORDER BY id)) / (lag(Total_Tax_nill_rated_Outward_taxable_supplies,2) over (ORDER BY id)) AS tax_nill_outware FROM gstr3b_periodical_summary
         ) AS subquery
         WHERE tax_nill_outware > .15) AS tax_nill_outware,
         
-
+        -- Tax paid In Credit
         (SELECT COUNT(tax_paid_in_cred) AS tax_paid_in_credit FROM (
             SELECT *, (`paid_by_total` - lag(paid_by_total, 2) over (ORDER BY id)) /  lag(paid_by_total,2) over (ORDER BY id) AS tax_paid_in_cred FROM(
                     SELECT id, Tax_Paid_In_Credit, Total_Tax_Paid, Tax_Paid_In_Credit / Total_Tax_Paid AS paid_by_total FROM  gstr3b_periodical_summary) AS gstr3
         ) AS P
         WHERE p.tax_paid_in_cred > .15) AS tax_paid_in_credit,
 
-
+        -- Latest financial year invoice value
         (SELECT SUM(Total_Iv) AS latest_fy_iv FROM (
             SELECT Total_Iv,
                 CASE 
@@ -95,7 +97,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
             )
         ) AS latest_fy_iv,
         
-        
+        -- Previous Financial year invoice value
         (SELECT * FROM (
             SELECT SUM(Total_Iv) AS pre_fy_iv FROM (
                 SELECT
@@ -163,7 +165,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
             )
         ) AS result) AS pre_fy_iv,
         
-        
+        -- Total Invoice Flag
         (SELECT 
             CASE
                 WHEN (total_value - previous_total_value) / previous_total_value > .20 
@@ -264,99 +266,31 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
             )
         )AS total_iv_flag,
         
-        
-        (SELECT (A.current_iv - B.previous_iv) / B.previous_iv > .15 as compare_tiv FROM 
-            (SELECT * FROM 
-                (SELECT Total_Iv as current_iv, MONTH(`month`) as current_month, YEAR(`month`) as current_year, YEAR(`month`) - 1 as previous_year,
-                    CASE 
-                        WHEN MONTH(`month`) >= 4 THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                        ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                    END AS financial_year, `month` AS months FROM derived_gstr1_periodical_summary
-                ) AS current_period
-                WHERE financial_year = (SELECT MAX(
-                    CASE 
-                        WHEN MONTH(`month`) >= 4 
-                    THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                        ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                    END
-                ) FROM derived_gstr1_periodical_summary)
-            ) A
-
-            LEFT JOIN 
-
-            (SELECT * FROM 
-                (SELECT Total_Iv as previous_iv, MONTH(`month`) as previous_month, YEAR(`month`) as previous_year,
-                    CASE 
-                        WHEN MONTH(`month`) >= 4 
-                    THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                        ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                    END AS financial_year, `month` AS months FROM derived_gstr1_periodical_summary
-                ) AS current_period
-                WHERE financial_year = (
-                    SELECT MAX(
-                        CASE 
-                        WHEN MONTH(`month`) >= 4 THEN CONCAT(YEAR(`month`) - 1, '-', YEAR(`month`)) 
-                          ELSE CONCAT(YEAR(`month`)-2, '-', YEAR(`month`)-1) 
-                        END) 
-                    FROM derived_gstr1_periodical_summary
-                )
-            ) AS B
-
-            ON A.previous_year = B.previous_year 
-            AND A.current_month = B.previous_month
-            WHERE ((A.current_iv - B.previous_iv) / B.previous_iv > .15) > 0
+        -- Compare Total invoice value by month (January 2023 - January 2024)
+        (SELECT COUNT(*) as compare_tiv FROM(
+            SELECT current_iv, previous_iv, current_month, CASE WHEN previous_iv IS NULL or previous_iv = 0 THEN 0 ELSE ((current_iv - previous_iv)/previous_iv) END AS compare_tiv FROM
+            (SELECT * FROM (SELECT Total_Iv as current_iv, lag(`Total_Iv`, 12) over (ORDER BY month) AS previous_iv, lag(`month`, 12) over (ORDER BY month) AS previous_month, MONTH(`month`) as current_month, `month` AS months FROM derived_gstr1_periodical_summary
+                            ) AS current_period) a
+                            
+                            WHERE previous_iv IS NOT NULL  
+            ) b 
+            WHERE compare_tiv > .15
         ) AS compare_tiv,
         
-
-        (SELECT COUNT(value) AS compare_ttv FROM
-            (SELECT 
-                CASE
-                    WHEN  (`current_tv` - lag(`current_tv`, 2) over (ORDER BY CID)) < 0 
-                    THEN 1
-                    ELSE 0
-                END AS value
-                FROM (
-                    SELECT * FROM (
-                        SELECT `id` AS CID, `Total_TV` as current_tv, MONTH(`month`) as current_month, YEAR(`month`) as current_year, YEAR(`month`) - 1 as previous_year,
-                                CASE 
-                                    WHEN MONTH(`month`) >= 4 THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                                    ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                                END AS financial_year, `month` AS months FROM derived_gstr1_periodical_summary
-                    ) AS current_period
-                    WHERE financial_year = (SELECT MAX(
-                        CASE 
-                            WHEN MONTH(`month`) >= 4 
-                                THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                            ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                        END
-                    ) FROM derived_gstr1_periodical_summary)
-                ) AS A
-
-                LEFT JOIN 
-
-                (SELECT * FROM 
-                    (SELECT `id`AS PID, `Total_TV` as previous_tv, MONTH(`month`) as previous_month, YEAR(`month`) as previous_year,
-                            CASE 
-                                WHEN MONTH(`month`) >= 4 THEN CONCAT(YEAR(`month`), '-', YEAR(`month`)+1) 
-                                ELSE CONCAT(YEAR(`month`)-1, '-', YEAR(`month`)) 
-                            END AS financial_year,
-                            `month` AS months FROM derived_gstr1_periodical_summary
-                    ) AS current_period
-                    WHERE financial_year = (SELECT MAX(
-                            CASE 
-                                WHEN MONTH(`month`) >= 4 
-                            THEN CONCAT(YEAR(`month`) - 1, '-', YEAR(`month`)) 
-                                ELSE CONCAT(YEAR(`month`)-2, '-', YEAR(`month`)-1) 
-                            END
-                        )FROM derived_gstr1_periodical_summary
-                    )
-                ) AS B
-
-                ON A.previous_year = B.previous_year 
-                AND A.current_month = B.previous_month
-            ) AS C
-            WHERE value > 0
-        ) AS compare_ttv,
+        (SELECT COUNT(*) AS compare_ttv FROM(
+            SELECT *, CASE 
+                        WHEN compare_tv = 1 
+                             AND (LAG(compare_tv, 1) OVER (ORDER BY months)) = 1 
+                             AND (LAG(compare_tv, 2) OVER (ORDER BY months)) = 1 
+                        THEN 1 
+                        ELSE 0 
+                    END AS is_consecutive FROM(
+                    SELECT *, CASE WHEN (current_tv < previous_tv) THEN 1 ELSE 0 END AS compare_tv FROM (SELECT Total_TV as current_tv, lag(`Total_TV`, 12) over (ORDER BY month) AS previous_tv, lag(`month`, 12) over (ORDER BY               month) AS previous_month, MONTH(`month`) as current_month, `month` AS months FROM derived_gstr1_periodical_summary
+               ) AS current_period
+             ) a
+         WHERE previous_tv IS NOT NULL
+        ) b
+        WHERE is_consecutive = 1) AS compare_ttv,
         
         (SELECT COUNT(*) AS payment_null_0
             FROM gstr3b_periodical_summary
@@ -377,7 +311,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         ) AS credit_transaction_amount,
         
         
-        (SELECT COUNT(*) FROM (
+        (SELECT COUNT(*) as cheque_bounce_outward FROM (
             SELECT YEAR(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS year,
                 IF(MONTH(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) <= 6, 1, 2) AS half_year, COUNT(*) AS outward_bounce_count
                 FROM 
@@ -390,7 +324,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         ) AS cheque_bounce_outward,
         
         
-        (SELECT COUNT(*) FROM (
+        (SELECT COUNT(*) as cheque_bounce_inward FROM (
             SELECT YEAR(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS year,
                 QUARTER(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS quarter,
                 COUNT(*) AS inward_bounce_count
@@ -403,7 +337,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
             ) A
         ) AS cheque_bounce_inward,
         
-        (SELECT COUNT(*) FROM (
+        (SELECT COUNT(*) as tech_cheque_bounce_inward FROM (
             SELECT 
                 YEAR(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS year,
                 QUARTER(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS quarter,
@@ -419,7 +353,7 @@ $query = "INSERT INTO `data_analysis`(`ref_id`,`b2b_iv`, `b2c_liv`,`b2c_siv`,`ex
         ) AS tech_cheque_bounce_inward,
         
         
-        (SELECT COUNT(*) FROM (
+        (SELECT COUNT(*) as non_tech_cheque_bounce_inward FROM (
             SELECT 
                 YEAR(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS year,
                 QUARTER(LAST_DAY(STR_TO_DATE(CONCAT('01-', `Month_Name`), '%d-%M-%Y'))) AS quarter,
