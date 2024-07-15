@@ -78,10 +78,14 @@ SELECT
         ELSE 1
     END AS cat_channel,
     
-    CASE 
-        WHEN acm_exist_customer.Assigned_Category IS NOT NULL THEN acm_exist_customer.Assigned_Category
-        ELSE 1
-    END AS cat_exist_customer,
+    -- CASE 
+    --     WHEN acm_exist_customer.Assigned_Category IS NOT NULL THEN acm_exist_customer.Assigned_Category
+    --     ELSE 1
+    -- END AS cat_exist_customer,
+
+    CASE
+        WHEN cd.Esixting_New_Customer_Flag IS NULL OR 0 THEN 'N' ELSE 'Y' end as Existing_cust_flag,
+
     
     CASE 
         WHEN acm_company_category.Assigned_Category IS NOT NULL THEN acm_company_category.Assigned_Category
@@ -99,9 +103,10 @@ SELECT
     END AS cat_industry_type,
     
     CASE 
-        WHEN acm_city_state.Assigned_Category IS NOT NULL THEN acm_city_state.Assigned_Category
-        ELSE 1
+        WHEN acm_district.Assigned_Category IS NOT NULL THEN acm_district.Assigned_Category
+        WHEN acm_state.Assigned_Category IS NOT NULL THEN acm_state.Assigned_Category ELSE 1
     END AS cat_city_state,
+    
     
     CASE 
         WHEN acm_lpsp.Assigned_Category IS NOT NULL THEN acm_lpsp.Assigned_Category
@@ -136,7 +141,7 @@ SELECT
        END AS cat_bank_emi,
       
       CASE WHEN age BETWEEN 0 AND 14 
-       OR age BETWEEN 20 AND 24 
+        OR age BETWEEN 20 AND 24 
             OR age>=65 THEN 5 
         WHEN age BETWEEN 30 AND 34 or age BETWEEN 40 AND 44 THEN 4 
         WHEN age BETWEEN 45 AND 49 or age BETWEEN 55 AND 59 THEN 3
@@ -146,7 +151,7 @@ SELECT
 FROM 
     ( 
        SELECT *,
-		TIMESTAMPDIFF(YEAR, DATE_FORMAT(STR_TO_DATE(Date_of_Birth, '%d-%m-%Y'), '%Y-%m-%d'), CURDATE()) AS age
+		TIMESTAMPDIFF(YEAR, STR_TO_DATE(Date_of_Birth, '%d/%m/%Y'), STR_TO_DATE(loan_date, '%d/%m/%Y')) AS age
         FROM 
         custdata
     )
@@ -179,9 +184,14 @@ AND acm_channel.Attribute = 'channel'
 AND acm_channel.Model_Name = '1'
 
 
+-- LEFT OUTER JOIN attribute_category_master AS acm_exist_customer ON TRIM(cd.Esixting_New_Customer_Flag) = TRIM(acm_exist_customer.Value_of_Attribute)
+-- AND acm_exist_customer.Attribute = 'DEAL_EXISTING_CUSTOMER'
+-- AND acm_exist_customer.Model_Name = '1'
+
 LEFT OUTER JOIN attribute_category_master AS acm_exist_customer ON TRIM(cd.Esixting_New_Customer_Flag) = TRIM(acm_exist_customer.Value_of_Attribute)
 AND acm_exist_customer.Attribute = 'DEAL_EXISTING_CUSTOMER'
 AND acm_exist_customer.Model_Name = '1'
+
 
 
 LEFT OUTER JOIN attribute_category_master AS acm_company_category ON TRIM(cd.Category_of_the_company) = TRIM(acm_company_category.Value_of_Attribute)
@@ -199,9 +209,13 @@ AND acm_industry_type.Attribute = 'industry_type'
 AND acm_industry_type.Model_Name = '1'
 
 
-LEFT OUTER JOIN attribute_category_master AS acm_city_state ON TRIM(cd.PIN_City_State) = TRIM(acm_city_state.Value_of_Attribute)
-AND acm_city_state.Attribute = 'city_state'
-AND acm_city_state.Model_Name = '1'
+LEFT OUTER JOIN attribute_category_master AS acm_district ON TRIM(cd.district) = TRIM(acm_district.Value_of_Attribute)
+AND acm_district.Attribute = 'DISTRICT'
+AND acm_district.Model_Name = '1'
+
+LEFT OUTER JOIN attribute_category_master AS acm_state ON TRIM(cd.state) = TRIM(acm_state.Value_of_Attribute)
+AND acm_state.Attribute = 'State_Name'
+AND acm_state.Model_Name = '1'
 
 
 LEFT OUTER JOIN attribute_category_master AS acm_lpsp ON TRIM(cd.Loan_Product_Sub_Proct_Type) = TRIM(acm_lpsp.Value_of_Attribute)

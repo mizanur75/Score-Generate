@@ -86,29 +86,9 @@
       <div class="row mt-5 text-center" style="margin-top: 300px !important;">
         <h2 class="mt-5">Please Upload file and complete the above section then go to bellow</h2>
         <hr>
-        <div class="col-3">
-          <form action="derived_gst.php" method="POST">
-            <button type="submit" class="btn btn-primary">Step 1. Derived GST Peri. Summary</button>
-          </form>
-        </div>
-        <div class="col-2">
-          <form action="data_analysis.php" method="POST">
-            <button type="submit" class="btn btn-success">Step 2. Data Analysis</button>
-          </form>
-        </div>
-        <div class="col-3">
-          <form action="scaled_inputs.php" method="POST">
-            <button type="submit" class="btn btn-secondary">Step 3. Scaled Inputs with Cat Attr</button>
-          </form>
-        </div>
-        <div class="col-2">
-          <form action="scaled_outputs.php" method="POST">
-            <button type="submit" class="btn btn-danger">Step 4. Scaled Outputs</button>
-          </form>
-        </div>
-        <div class="col-2">
+        <div class="col-12">
           <form action="score_generate.php" method="POST">
-            <button type="submit" class="btn btn-warning">Step 5. Generate Score</button>
+            <button type="submit" class="btn btn-warning">Generate Score</button>
           </form>
         </div>
       </div>

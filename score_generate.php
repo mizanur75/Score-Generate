@@ -2,6 +2,41 @@
 
 require 'db.php';
 
+  try{
+    $derived_gst = "CALL `derived_gst`()";
+    $query = $conn->prepare($derived_gst);
+    $success = $query->execute();
+
+  } catch(\Exception $e){
+    echo "Derived GST Error ".$e->getMessage(); exit;
+  }
+
+  try{
+    $data_analysis = "CALL `data_analysis`()";
+    $query = $conn->prepare($data_analysis);
+    $success = $query->execute();
+
+  } catch(\Exception $e){
+    echo "Data Analysis Error ".$e->getMessage(); exit;
+  }
+
+  try{
+    $scaled_input = "CALL `scaled_input`()";
+    $query = $conn->prepare($scaled_input);
+    $success = $query->execute();
+
+  } catch(\Exception $e){
+    echo "Scaled Input Error ".$e->getMessage(); exit;
+  }
+
+  try{
+    $scaled_output = "CALL `scaled_output`()";
+    $query = $conn->prepare($scaled_output);
+    $success = $query->execute();
+    
+  } catch(\Exception $e){
+    echo "Scaled Output Error ".$e->getMessage(); exit;
+  }
 
 // Fetch data from variable_coefficient table
 $variable_coefficient_query = $conn->query("SELECT * FROM variable_coefficient");
